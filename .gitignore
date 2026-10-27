@@ -1,0 +1,9 @@
+# Rust / Cargo build artifacts (10GB+ in Bevy)
+/target/
+Cargo.lock
+
+# OS / Editor files
+.DS_Store
+.vscode/
+.idea/
+*.swp
