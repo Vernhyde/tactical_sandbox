@@ -6,6 +6,10 @@ edition = "2024"
 [dependencies]
 bevy = { version = "0.15", features = ["dynamic_linking"] }
 
+[features]
+default = []
+dynamic_linking = ["bevy/dynamic_linking"]
+
 [profile.dev]
 opt-level = 1
 
