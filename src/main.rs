@@ -1,6 +1,6 @@
 //! Tactical Sandbox - Syntax & ECS Verification Test
+use bevy::camera::ScalingMode;
 use bevy::prelude::*;
-use bevy::render::camera::ScalingMode;
 
 const ARENA_SIZE_M: f32 = 40.0; // 40m [131.2 ft] training pad
 const OPERATOR_SPEED_MPS: f32 = 4.5; // 4.5 m/s [14.8 fps] tactical pace
@@ -48,7 +48,7 @@ fn setup_tactical_arena(
     commands.spawn((
         DirectionalLight {
             illuminance: 10_000.0,
-            shadows_enabled: true,
+            shadow_maps_enabled: true,
             ..default()
         },
         Transform::from_xyz(15.0, 25.0, 15.0).looking_at(Vec3::ZERO, Vec3::Y),
@@ -129,10 +129,18 @@ fn move_possessed_operator(
 ) {
     let mut direction = Vec3::ZERO;
 
-    if keyboard.pressed(KeyCode::KeyW) { direction.z -= 1.0; }
-    if keyboard.pressed(KeyCode::KeyS) { direction.z += 1.0; }
-    if keyboard.pressed(KeyCode::KeyA) { direction.x -= 1.0; }
-    if keyboard.pressed(KeyCode::KeyD) { direction.x += 1.0; }
+    if keyboard.pressed(KeyCode::KeyW) {
+        direction.z -= 1.0;
+    }
+    if keyboard.pressed(KeyCode::KeyS) {
+        direction.z += 1.0;
+    }
+    if keyboard.pressed(KeyCode::KeyA) {
+        direction.x -= 1.0;
+    }
+    if keyboard.pressed(KeyCode::KeyD) {
+        direction.x += 1.0;
+    }
 
     if direction.length_squared() > 0.0 {
         direction = direction.normalize();
@@ -148,11 +156,11 @@ fn update_indicator_colors(
     query: Query<(&MeshMaterial3d<StandardMaterial>, Has<Possessed>), With<Operator>>,
 ) {
     for (mat_handle, is_possessed) in &query {
-        if let Some(material) = materials.get_mut(mat_handle) {
+        if let Some(mut material) = materials.get_mut(mat_handle) {
             material.base_color = if is_possessed {
                 Color::srgb(0.898, 0.663, 0.239) // Amber (#e5a93d)
             } else {
-                Color::srgb(0.3, 0.35, 0.3)      // Olive Drab
+                Color::srgb(0.3, 0.35, 0.3) // Olive Drab
             };
         }
     }
