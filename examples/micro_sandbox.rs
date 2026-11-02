@@ -7,7 +7,7 @@ fn main() {
         .add_plugins((DefaultPlugins, PhysicsPlugins::default()))
         .add_systems(Startup, setup_scene)
         .add_systems(Update, read_player_input) //Variable Rate Loop
-        .add_systems(FixedUpdate, apply_locomotion) //64hz Loop
+        .add_systems(FixedUpdate, apply_locomotion) //64hz Loo
         .run();
 }
 
@@ -82,6 +82,35 @@ fn setup_scene(
                     .looking_at(Vec3::ZERO, Vec3::Y),
             ));
         });
+}
+
+fn handle_mouse_clicks(
+    mouse_input: Res<ButtonInput<MouseButton>>,
+    windows: Query<&Window>,
+    camera_query: Query<(&Camera, &GlobalTransform)>, //This is to tell where the camera is looking from
+    spatial_query: SpatialQuery, //This is an Avian3d tool that raycast against colliders
+) {
+    if mouse_input.just_pressed(MouseButton::Right) {
+        let window = windows.single();
+        let (camera, camera_transform) = camera_query.single();
+
+        if let Some(cursor_position) = window.cursor_position()
+        //This gets the 2D pixel coords of the cursor in the window
+        {
+            if let Ok(ray) = camera.viewport_to_world(camera_transform, cursor_position) {
+                if let Some(hit) = spatial_query.cast_ray(
+                    ray.origin,
+                    ray.direction,
+                    100.0,
+                    true,
+                    &SpatialQueryFilter::default(),
+                ) {
+                    let target_point = ray.origin + ray.direction * hit.time_of_impact;
+                    println!("Commanded to move to: {}", target_point);
+                }
+            }
+        }
+    }
 }
 
 fn read_player_input(
